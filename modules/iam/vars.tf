@@ -1,0 +1,12 @@
+variable "parent_compartment_id" {}
+variable "iam_compartment_name" {}
+variable "iam_compartment_description" {}
+variable "iam_compartment_enable_delete" {}
+variable "tenancy_ocid" {}
+variable "iam_policy_is_deployed" {}
+variable "iam_policy_name" {}
+variable "iam_policy_description" {}
+variable "iam_policy_statements" {}
+variable "iam_dynamic_group_matching_rule" {}
+variable "iam_dynamic_group_name" {}
+variable "iam_dynamic_group_description" {}

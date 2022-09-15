@@ -1,0 +1,27 @@
+variable "oke_is_kubernetes_dashboard_enabled" {}
+variable "oke_is_tiller_enabled" {}
+variable "oke_pods_cidr" {}
+variable "oke_services_cidr" {}
+variable "oke_cluster_name" {}
+variable "oke_node_pool_name" {}
+variable "compartment_id" {}
+variable "oke_kubernetes_version" {}
+variable "oke_image_id" {}
+variable "availability_domain_names" {}
+variable "oke_node_pool_size" {}
+variable "oke_node_shape" {}
+variable "oke_initial_node_labels_key" {}
+variable "oke_initial_node_labels_value" {}
+variable "oke_subnet_cidr" {}
+variable "oke_subnet_display_name" {}
+variable "oke_subnet_dns_label" {}
+variable "oke_rt_display_name" {}
+variable "oke_sl_display_name" {}
+variable "oke_node_ocpu" {}
+variable "oke_node_memory_in_gb" {}
+
+variable "vcn_id" {}
+variable "vcn_default_dhcp_options_id" {}
+variable "service_cidr_block" {}
+variable "ng_id" {}
+variable "sg_id" {}

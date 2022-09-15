@@ -1,0 +1,619 @@
+# reference for schema.yaml:
+# https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/terraformconfigresourcemanager_topic-schema.htm#exampleschema
+title: "OCI Anomaly Detection Pipeline"
+description: "Deploy your Anomaly Detection pipeline."
+schemaVersion: 1.1.0
+version: 20190404
+locale: "en"
+
+variableGroups:
+- title: "Authentication"
+  visible: false
+  variables:
+    - tenancy_ocid
+    - user_ocid
+    - fingerprint
+    - private_key_path
+
+# order: a tile for IAM
+- title: "Identity and Access Management (IAM)"
+  variables:
+    - region
+    - parent_compartment_id
+    - iam_compartment_name
+    - iam_compartment_description
+    - iam_compartment_enable_delete
+    - iam_policy_is_deployed
+    - iam_policy_name
+    - iam_policy_description
+    - iam_dynamic_group_name
+    - iam_dynamic_group_description
+
+# order: a tile for selection of resources
+- title: "Select Resources"
+  variables:
+    - ads_is_deployed
+    - object_storage_is_deployed
+    - ods_is_deployed
+    - oke_is_deployed
+    - streaming_is_deployed
+    - vcn_is_deployed
+
+# order: a tile for each selected resource
+- title: "Anomaly Detection Service (ADS)"
+  variables:
+    - ads_project_display_name
+    - ads_project_description
+- title: "Object Storage Bucket"
+  variables:
+    - object_storage_bucket_name
+    - object_storage_bucket_access_type
+    - object_storage_bucket_storage_tier
+    - object_storage_bucket_versioning
+- title: "Oracle Data Science Platform (ODS)"
+  variables:
+    - ods_notebook_session_display_name
+    - ods_notebook_session_shape
+    - ods_notebook_session_ocpu
+    - ods_notebook_session_memory_in_gb
+    - ods_notebook_session_block_storage_size_in_gbs
+    - ods_project_display_name
+- title: "Oracle Kubernetes Engine (OKE)"
+  variables:
+    - oke_sl_display_name
+    - oke_is_kubernetes_dashboard_enabled
+    - oke_is_tiller_enabled
+    - oke_pods_cidr
+    - oke_services_cidr
+    - oke_cluster_name
+    - oke_node_pool_name
+    - oke_kubernetes_version
+    - oke_oracle_linux_os_version
+    - oke_node_pool_size
+    - oke_node_shape
+    - oke_node_ocpu
+    - oke_node_memory_in_gb
+    - oke_initial_node_labels_key
+    - oke_initial_node_labels_value
+    - oke_subnet_cidr
+    - oke_subnet_display_name
+    - oke_subnet_dns_label
+    - oke_rt_display_name
+    - oke_sl_display_name
+- title: "Streaming"
+  variables:
+    - stream_pool_name
+    - stream_name
+    - stream_partitions
+    - stream_retention_in_hours
+- title: "Virtual Cloud Network (VCN)"
+  variables:
+    - vcn_cidrs
+    - vcn_display_name
+    - vcn_dns_label
+    - ng_display_name
+    - sg_display_name
+
+variables:
+  # details: a tile for IAM
+  region:
+    type: oci:identity:region:name
+    required: true
+    description: "Region where the stack will be provisioned."
+    title: "Region"
+    visible: true
+  parent_compartment_id:
+    type: oci:identity:compartment:id
+    required: true
+    description: "Compartment where the new compartment containing the stack will be provisioned."
+    title: "Parent Compartment"
+    visible: true
+  iam_compartment_name:
+    type: string
+    required: true
+    description: "(Updatable) The name you assign to the compartment during creation. The name must be unique across all compartments in the parent compartment. Avoid entering confidential information."
+    title: "Name of New Compartment"
+    default: "AD_workshop"
+    visible: true
+    pattern: "^[_\\-a-zA-Z0-9\\.]*$"
+  iam_compartment_description:
+    type: string
+    required: true
+    description: "(Updatable) The description you assign to the compartment during creation. Does not have to be unique, and it's changeable."
+    title: "Descripion for New Compartment"
+    default: "Compartment for Anomaly Detection workshop"
+    visible: true
+  iam_compartment_enable_delete:
+    type: boolean
+    required: true
+    description: "If set to false, the provider will implicitly import the compartment if there is a name collision, and will not actually delete the compartment on destroy or removal of the resource declaration. If set to true, the provider will throw an error on a name collision with another compartment, and will attempt to delete the compartment on destroy or removal of the resource declaration."
+    title: "Enable Delete for Compartment"
+    default: true
+    visible: true
+  iam_policy_is_deployed:
+    type: boolean
+    required: true
+    description: "Creates any IAM Policy and Dynamic Group resources that are typically associated with each selected resource."
+    title: "Deploy IAM Policy and Dynamic Group"
+    default: true
+    visible: true
+  iam_policy_name:
+    type: string
+    required: true
+    description: "The name you assign to the policy during creation. The name must be unique across all policies in the tenancy and cannot be changed."
+    title: "IAM Policy Name"
+    default: "AD_policy"
+    visible: iam_policy_is_deployed
+    pattern: "^[_\\-a-zA-Z0-9\\.]*$"
+  iam_policy_description:
+    type: string
+    required: true
+    description: "(Updatable) The description you assign to the policy during creation. Does not have to be unique, and it's changeable."
+    title: "IAM Policy Description"
+    default: "Policy for Anomaly Detection workshop"
+    visible: iam_policy_is_deployed
+  iam_dynamic_group_name:
+    type: string
+    required: true
+    description: "The name you assign to the dynamic group during creation. The name must be unique across all groups in the tenancy and cannot be changed."
+    title: "IAM Dynamic Group Name"
+    default: "AD_dynamic_group"
+    visible: iam_policy_is_deployed
+    pattern: "^[_\\-a-zA-Z0-9\\.]*$"
+  iam_dynamic_group_description:
+    type: string
+    required: true
+    description: "(Updatable) The description you assign to the dynamic group during creation. Does not have to be unique, and it's changeable."
+    title: "IAM Dynamic Group Description"
+    default: "Dynamic Group for Anomaly Detection workshop"
+    visible: iam_policy_is_deployed
+
+  # details: a tile for selection of resources
+  ads_is_deployed:
+    type: boolean
+    required: true
+    description: "Project container for Anomaly Detection Service (ADS). ADS is an AI service that enables developers to more easily build business-specific anomaly detection models that flag critical incidents, resulting in faster time to detection and resolution. Specialized APIs and automated model selection simplify training and deploying anomaly detection models to applications and operations—all without data science expertise."
+    title: "Deploy Anomaly Detection Service (ADS) Project Container"
+    default: true
+  object_storage_is_deployed:
+    type: boolean
+    required: true
+    description: "Securely store any type of data in its native format, with built-in redundancy."
+    title: "Deploy Object Storage Bucket"
+    default: true
+  ods_is_deployed:
+    type: boolean
+    required: true
+    description: "Serverless platform that lets developers create, run, and scale applications without managing any infrastructure."
+    title: "Deploy Oracle Data Science Platform (ODS)"
+    default: true
+  oke_is_deployed:
+    type: boolean
+    required: true
+    description: "Oracle-managed container orchestration service that can reduce the time and cost to build modern cloud native applications."
+    title: "Deploy Oracle Kubernetes Engine (OKE)"
+    default: true
+  streaming_is_deployed:
+    type: boolean
+    required: true
+    description: "Real-time, serverless, Apache Kafka-compatible event streaming platform for developers and data scientists."
+    title: "Deploy Streaming"
+    default: true
+  vcn_is_deployed:
+    type: boolean
+    required: true
+    description: "Customizable and private cloud network."
+    title: "Deploy Virtual Cloud Network"
+    default: true
+
+  # detail: a tile for each selected resource
+  ads_project_display_name:
+    type: string
+    required: true
+    description: "(Updatable) A user-friendly display name for the ADS Project. It does not have to be unique and can be modified. Avoid entering confidential information."
+    title: "ADS Project Display Name"
+    default: "AD_model_project"
+    visible: ads_is_deployed
+  ads_project_description:
+    type: string
+    required: true
+    description: "(Updatable) A short description of the project."
+    title: "ADS Project Description"
+    default: "Project container for Anomaly Detection models"
+    visible: ads_is_deployed
+
+  object_storage_bucket_name:
+    type: string
+    required: true
+    description: "The name of the Bucket. Valid characters are uppercase or lowercase letters, numbers, hyphens, underscores, and periods. Bucket names must be unique within an Object Storage"
+    title: "Bucket Name"
+    default: "Ad_bucket"
+    visible: object_storage_is_deployed
+    pattern: "^[_\\-a-zA-Z0-9\\.]*$"
+  object_storage_bucket_access_type:
+    type: enum
+    enum:
+      - NoPublicAccess
+      - ObjectRead
+      - ObjectReadWithoutList
+    required: true
+    description: "(Updatable) The type of public access enabled on this object_storage_bucket. A object_storage_bucket is set to \"NoPublicAccess\" by default, which only allows an authenticated caller to access the object_storage_bucket and its contents. When \"ObjectRead\" is enabled on the object_storage_bucket, public access is allowed for the \"GetObject\", \"HeadObject\", and \"ListObjects\" operations. When \"ObjectReadWithoutList\" is enabled on the object_storage_bucket, public access is allowed for the \"GetObject\" and \"HeadObject\" operations."
+    title: "Bucket Access Type"
+    default: NoPublicAccess
+    visible: object_storage_is_deployed
+  object_storage_bucket_storage_tier:
+    type: enum
+    enum:
+      - Standard
+      - Archive
+    required: true
+    description: "The storage tier of the object_storage_bucket. The Standard storage tier is \"hot\" storage used for data that you need to access quickly, immediately, and frequently. The Archive storage tier is \"cold\" storage used for data seldom or rarely access, but that must be retained and preserved for long periods of time."
+    title: "Bucket Access Type"
+    default: Standard
+    visible: object_storage_is_deployed
+  object_storage_bucket_versioning:
+    type: enum
+    enum:
+      - Enabled
+      - Disabled
+    required: true
+    description: "(Updatable) Use this option to enable versioning during object_storage_bucket creation. Objects in a version enabled object_storage_bucket are protected from overwrites and deletions. Previous versions of the same object will be available in the object_storage_bucket."
+    title: "Bucket Versioning"
+    default: Disabled
+    visible: object_storage_is_deployed
+  ods_project_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your ODS Project instance."
+    title: "ODS Project Name"
+    default: "AD_data_science_project"
+    visible: ods_is_deployed
+  ods_notebook_session_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your ODS Notebook Session instance."
+    title: "ODS Notebook Session Name"
+    default: "AD_data_science_notebook_session"
+    visible: ods_is_deployed
+  ods_notebook_session_shape:
+    type: string
+    required: true
+    description: "(Updatable) The shape used to launch the notebook session compute instance. Review this page for details on allowed shapes: https://docs.oracle.com/en-us/iaas/data-science/using/manage-notebook-sessions.htm"
+    title: "ODS Notebook Session Shape"
+    default: "VM.Standard.E3.Flex"
+    visible: ods_is_deployed
+  ods_notebook_session_ocpu:
+    type: integer
+    required: true
+    description: "(Updatable) The number of OCPUs with which to provision the notebook session compute instance."
+    title: "ODS Notebook Session Core Count (# OCPUs)"
+    default: 2
+    minimum: 1
+    maximum: 64
+    visible:
+      and:
+        - ods_is_deployed
+        - and:
+          - or:
+            - eq:
+              - ods_notebook_session_shape
+              - "VM.Standard.E3.Flex"
+            - eq:
+              - ods_notebook_session_shape
+              - "VM.Standard.E4.Flex"
+  ods_notebook_session_memory_in_gb:
+    type: integer
+    required: true
+    description: "(Updatable) The amount of memory in GB with which to provision the notebook session compute instance."
+    title: "ODS Notebook Session Memory (GB)"
+    default: 32
+    minimum: 1
+    maximum: 1024
+    visible:
+      and:
+        - ods_is_deployed
+        - and:
+          - or:
+            - eq:
+              - ods_notebook_session_shape
+              - "VM.Standard.E3.Flex"
+            - eq:
+              - ods_notebook_session_shape
+              - "VM.Standard.E4.Flex"
+  ods_notebook_session_block_storage_size_in_gbs:
+    type: integer
+    required: true
+    description: "(Updatable) A notebook session instance is provided with a block storage volume. This specifies the size of the volume in GBs."
+    title: "ODS Notebook Session Storage Volume Size (GB)"
+    default: 100
+    minimum: 50
+    maximum: 32000
+    visible: ods_is_deployed
+
+  oke_is_kubernetes_dashboard_enabled:
+    type: boolean
+    description: "Whether or not to enable the Kubernetes Dashboard add-on."
+    title: "Enable Kubernetes Dashboard for OKE"
+    default: true
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_is_tiller_enabled:
+    type: boolean
+    description: "Whether or not to enable the Tiller add-on."
+    title: "Enable Tiller for OKE"
+    default: true
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_pods_cidr:
+    type: string
+    description: "The CIDR block for Kubernetes pods."
+    title: "OKE Pods CIDR"
+    default: "10.244.0.0/16"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_services_cidr:
+    type: string
+    description: "The CIDR block for Kubernetes services."
+    title: "OKE Services CIDR"
+    default: "10.96.0.0/16"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_cluster_name:
+    type: string
+    description: "(Updatable) The name of the cluster. Avoid entering confidential information."
+    title: "OKE Cluster Name"
+    default: "AD_oke_cluster"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_node_pool_name:
+    type: string
+    description: "(Updatable) The name of the node pool. Avoid entering confidential information."
+    title: "OKE Node Pool Name"
+    default: "AD_oke_node_pool"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_kubernetes_version:
+    type: string
+    description: "(Updatable) The version of Kubernetes to install on the nodes in the node pool."
+    title: "OKE Kubernetes Version"
+    default: "v1.24.1"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_oracle_linux_os_version:
+    type: enum
+    description: "Version of Oracle Linux to use for OKE nodes in the node pool."
+    required: true
+    enum:
+      - "7.9"
+      - "7.8"
+      - "7.7"
+      - "7.6"
+    title: "Oracle Linux OS Version"
+    default: "7.9"
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_node_pool_size:
+    type: integer
+    required: true
+    description: "(Updatable) The number of nodes that should be in the node pool."
+    title: "OKE Node Pool Size (# Nodes)"
+    default: 2
+    minimum: 1
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_node_shape:
+    type: string
+    description: "(Updatable) The name of the node shape of the nodes in the node pool."
+    title: "OKE Node Shape"
+    default: "VM.Standard.E3.Flex"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_node_ocpu:
+    type: integer
+    required: true
+    description: "(Updatable) The number of OCPUs available to each node in the node pool."
+    title: "OKE Node Core Count (# OCPUs)"
+    default: 1
+    minimum: 1
+    maximum: 64
+    visible:
+      and:
+        - oke_is_deployed
+        - and:
+          - or:
+            - eq:
+              - oke_node_shape
+              - "VM.Standard.E3.Flex"
+            - eq:
+              - oke_node_shape
+              - "VM.Standard.E4.Flex"
+  oke_node_memory_in_gb:
+    type: integer
+    required: true
+    description: "(Updatable) The amount of memory in GB available to each node in the node pool."
+    title: "OKE Node Memory (GB)"
+    default: 16
+    minimum: 1
+    maximum: 1024
+    visible:
+      and:
+        - oke_is_deployed
+        - and:
+          - or:
+            - eq:
+              - oke_node_shape
+              - "VM.Standard.E3.Flex"
+            - eq:
+              - oke_node_shape
+              - "VM.Standard.E4.Flex"
+  oke_initial_node_labels_key:
+    type: string
+    description: "The key in a key/value pair to add to nodes after they join the Kubernetes cluster."
+    title: "OKE Initial Node Labels Key"
+    default: "AD_oke_node_key"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_initial_node_labels_value:
+    type: string
+    description: "The value in a key/value pair to add to nodes after they join the Kubernetes cluster."
+    title: "OKE Initial Node Labels Value"
+    default: "AD_oke_node_value"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_cidr:
+    type: string
+    description: "(Updatable) The CIDR IP address range of the subnet containing the OKE cluster and node pool."
+    title: "OKE Subnet CIDR Range"
+    default: "10.0.20.0/24"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Subnet Display Name"
+    default: "AD_oke_subnet"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_dns_label:
+    type: string
+    description: "A DNS label for the OKE subnet, used in conjunction with the VNIC's hostname and VCN's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter and is unique within the VCN. The value cannot be changed. This value must be set if you want to use the Internet and VCN Resolver to resolve the hostnames of instances in the subnet. It can only be set if the VCN itself was created with a DNS label."
+    title: "OKE Subnet DNS Label"
+    default: "okesub"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+    pattern: "^[a-zA-Z][a-zA-Z0-9]{0,14}$"
+  oke_rt_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the route table of the OKE subnet. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Route Table Display Name"
+    default: "AD_oke_route_table"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_sl_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the security list of the OKE subnet. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Security List Display Name"
+    default: "AD_oke_security_list"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+
+  stream_pool_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Stream Pool instance."
+    title: "Stream Pool Name"
+    default: "AD_stream_pool"
+    visible: streaming_is_deployed
+  stream_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Stream instance."
+    title: "Stream Name"
+    default: "AD_stream"
+    visible: streaming_is_deployed
+  stream_partitions:
+    type: integer
+    required: true
+    description: "The number of partitions in the stream."
+    title: "Number of Stream Partitions"
+    default: 1
+    minimum: 1
+    visible: streaming_is_deployed
+  stream_retention_in_hours:
+    type: integer
+    required: true
+    description: "The retention period of the stream, in hours."
+    title: "Stream Retention in Hours"
+    default: 168
+    minimum: 24
+    maximum: 168
+    visible: streaming_is_deployed
+
+  vcn_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Virtual Cloud Network (VCN)."
+    title: "VCN Display Name"
+    default: "AD_vcn"
+    visible: vcn_is_deployed
+  vcn_dns_label:
+    type: string
+    required: true
+    description: "A DNS label for the VCN, used in conjunction with the VNIC's hostname and subnet's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter. The value cannot be changed. The absence of this parameter means the Internet and VCN Resolver will not work for this VCN."
+    title: "VCN DNS Label"
+    default: "vcn"
+    maxLength: 15
+    visible: vcn_is_deployed
+  vcn_cidrs:
+    type: array
+    items:
+      pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+      type: string
+    required: true
+    description: "(Updatable) A list of CIDR ranges to use for this VCN"
+    title: "VCN CIDRs"
+    default: ["10.0.0.0/16"]
+    visible: vcn_is_deployed
+  ng_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Network Address Translation (NAT) Gateway."
+    title: "NAT Gateway Display Name"
+    default: "AD_nat_gateway"
+    visible: vcn_is_deployed
+  sg_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Service Gateway."
+    title: "Service Gateway Display Name"
+    default: "AD_service_gateway"
+    visible: vcn_is_deployed
