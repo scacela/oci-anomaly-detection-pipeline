@@ -13,9 +13,7 @@ Deploy your Anomaly Detection pipeline.
 <p></p>
 <pre>
 <b>Compartment</b>: Logical container for resources, used to manage access to resources as a function of Identity and Access Management (IAM).
-
 <b>Policy</b>: An arrangement of statements used to manage access to resources as a function of Identity and Access Management (IAM).
-
 <b>Dynamic Group</b>: An arrangement of matching rules used to manage permissions to enable specific resources to access other specified resources.
 </pre>
 </details>
