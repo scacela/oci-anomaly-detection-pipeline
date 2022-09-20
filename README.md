@@ -25,15 +25,12 @@ Project resource for Anomaly Detection Service (ADS). ADS is an AI service that 
 </pre>
 </details>
 <details>
-<details>
-<details>
 <summary>Object Storage Bucket</summary>
 <p></p>
 <pre>
 Securely store any type of data in its native format, with built-in redundancy.
 </pre>
 </details>
-<details>
 <details>
 <summary>Oracle Data Science Platform (ODS)</summary>
 <p></p>
