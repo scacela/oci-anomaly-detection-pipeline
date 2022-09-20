@@ -84,7 +84,7 @@ In Chrome, Firefox and Safari, you can do this with `CTRL`+`Click` > Select `Ope
 [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/scacela/oci-digital-twin-pipeline/archive/refs/tags/v1.0.0.zip)
 2. Log into your Oracle Cloud Infrastructure (OCI) tenancy with your user credentials. You will then be redirected to the `Stack Information` section of Resource Manager.
 3. In the `Stack Information` section, select the checkbox to confirm that you accept the [Oracle Terms of Use](https://cloudmarketplace.oracle.com/marketplace/content?contentId=50511634&render=inline).
-4. Under `Create in compartment`, select a compartment from the dropdown menu where you wish to deploy the resource that represents the stack as a unit.
+4. In the `Create in compartment` field, select a compartment from the dropdown menu where you wish to deploy the resource that represents the stack as a unit.
 5. Click `Next` to proceed to the `Configure Variables` section.
 6. For each resource that you wish to deploy, verify that the corresponding checkbox is selected in the `Select Resources` tile. Optionally, you can customize the attributes of each selected resource once an additional tile that presents configuration options for its respective resource appears below.
 7. When you are finished editing your variables in the `Configure Variables` section, click `Next` to proceed to the `Review` section.
