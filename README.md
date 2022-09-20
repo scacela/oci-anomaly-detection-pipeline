@@ -52,6 +52,7 @@ Oracle-managed container orchestration service that can reduce the time and cost
 Broadcasts messages to distributed components through a publish-subscribe pattern, delivering secure, highly reliable, low latency and durable messages for applications hosted on Oracle Cloud Infrastructure and externally.
 </pre>
 </details>
+<details>
 <summary>Streaming</summary>
 <p></p>
 <pre>
