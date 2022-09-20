@@ -53,11 +53,27 @@ variable "oke_node_ocpu" { default = 1 }
 variable "oke_node_memory_in_gb" { default = 16 }
 variable "oke_initial_node_labels_key" { default = "AD_oke_node_key" }
 variable "oke_initial_node_labels_value" { default = "AD_oke_node_value" }
-variable "oke_subnet_cidr" { default = "10.0.20.0/24" }
-variable "oke_subnet_display_name" { default = "AD_oke_subnet" }
-variable "oke_subnet_dns_label" { default = "okesub" }
-variable "oke_rt_display_name" { default = "AD_oke_route_table" }
-variable "oke_sl_display_name" { default = "AD_oke_security_list" }
+variable "oke_subnet_cluster_cidr" { default = "10.0.0.0/28" }
+variable "oke_subnet_cluster_display_name" { default = "AD_oke_subnet_cluster" }
+variable "oke_subnet_cluster_dns_label" { default = "okesubcluster" }
+variable "oke_rt_cluster_display_name" { default = "AD_oke_route_table_cluster" }
+variable "oke_sl_cluster_display_name" { default = "AD_oke_security_list_cluster" }
+variable "oke_subnet_lb_cidr" { default = "10.0.20.0/24" }
+variable "oke_subnet_lb_display_name" { default = "AD_oke_subnet_lb" }
+variable "oke_subnet_lb_dns_label" { default = "okesublb" }
+variable "oke_rt_lb_display_name" { default = "AD_oke_route_table_lb" }
+variable "oke_sl_lb_display_name" { default = "AD_oke_security_list_lb" }
+variable "oke_subnet_worker_cidr" { default = "10.0.10.0/24" }
+variable "oke_subnet_worker_display_name" { default = "AD_oke_subnet_worker" }
+variable "oke_subnet_worker_dns_label" { default = "okesubworker" }
+variable "oke_rt_worker_display_name" { default = "AD_oke_route_table_worker" }
+variable "oke_sl_worker_display_name" { default = "AD_oke_security_list_worker" }
+
+# ons
+variable "ons_is_deployed" { default = true }
+variable "ons_topic_name" { default = "AD_ons_topic" }
+variable "ons_subscription_endpoint" { default = "" }
+variable "ons_subscription_protocol" { default = "EMAIL" }
 
 # streaming
 variable "streaming_is_deployed" { default = true }
@@ -74,5 +90,6 @@ variable "vcn_cidrs" {
 }
 variable "vcn_display_name" { default = "AD_vcn" }
 variable "vcn_dns_label" { default = "ad-vcn" }
+variable "ig_display_name" { default = "AD_internet_gateway" }
 variable "ng_display_name" { default = "AD_nat_gateway" }
 variable "sg_display_name" { default = "AD_service_gateway" }

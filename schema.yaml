@@ -1,7 +1,7 @@
 # reference for schema.yaml:
 # https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/terraformconfigresourcemanager_topic-schema.htm#exampleschema
-title: "OCI Anomaly Detection Pipeline"
-description: "Deploy your Anomaly Detection pipeline."
+title: "OCI Digital Twin Pipeline"
+description: "Deploy your Digital Twin pipeline!"
 schemaVersion: 1.1.0
 version: 20190404
 locale: "en"
@@ -18,8 +18,8 @@ variableGroups:
 # order: a tile for IAM
 - title: "Identity and Access Management (IAM)"
   variables:
-    - region
     - parent_compartment_id
+    - region
     - iam_compartment_name
     - iam_compartment_description
     - iam_compartment_enable_delete
@@ -36,6 +36,7 @@ variableGroups:
     - object_storage_is_deployed
     - ods_is_deployed
     - oke_is_deployed
+    - ons_is_deployed
     - streaming_is_deployed
     - vcn_is_deployed
 
@@ -60,7 +61,6 @@ variableGroups:
     - ods_project_display_name
 - title: "Oracle Kubernetes Engine (OKE)"
   variables:
-    - oke_sl_display_name
     - oke_is_kubernetes_dashboard_enabled
     - oke_is_tiller_enabled
     - oke_pods_cidr
@@ -75,11 +75,26 @@ variableGroups:
     - oke_node_memory_in_gb
     - oke_initial_node_labels_key
     - oke_initial_node_labels_value
-    - oke_subnet_cidr
-    - oke_subnet_display_name
-    - oke_subnet_dns_label
-    - oke_rt_display_name
-    - oke_sl_display_name
+    - oke_subnet_cluster_cidr
+    - oke_subnet_cluster_display_name
+    - oke_subnet_cluster_dns_label
+    - oke_rt_cluster_display_name
+    - oke_sl_cluster_display_name
+    - oke_subnet_lb_cidr
+    - oke_subnet_lb_display_name
+    - oke_subnet_lb_dns_label
+    - oke_rt_lb_display_name
+    - oke_sl_lb_display_name
+    - oke_subnet_worker_cidr
+    - oke_subnet_worker_display_name
+    - oke_subnet_worker_dns_label
+    - oke_rt_worker_display_name
+    - oke_sl_worker_display_name
+- title: "Oracle Notifications Service (ONS)"
+  variables:
+    - ons_topic_name
+    - ons_subscription_endpoint
+    - ons_subscription_protocol
 - title: "Streaming"
   variables:
     - stream_pool_name
@@ -91,22 +106,58 @@ variableGroups:
     - vcn_cidrs
     - vcn_display_name
     - vcn_dns_label
+    - ig_display_name
     - ng_display_name
     - sg_display_name
 
 variables:
   # details: a tile for IAM
-  region:
-    type: oci:identity:region:name
-    required: true
-    description: "Region where the stack will be provisioned."
-    title: "Region"
-    visible: true
   parent_compartment_id:
     type: oci:identity:compartment:id
     required: true
     description: "Compartment where the new compartment containing the stack will be provisioned."
     title: "Parent Compartment"
+    visible: true
+  region:
+    type: enum
+    enum:
+      - "us-sanjose-1"
+      - "us-phoenix-1"
+      - "us-ashburn-1"
+      - "uk-london-1"
+      - "uk-cardiff-1"
+      - "sa-vinhedo-1"
+      - "sa-saopaulo-1"
+      - "sa-santiago-1"
+      - "mx-queretaro-1"
+      - "me-jeddah-1"
+      - "me-dubai-1"
+      - "me-abudhabi-1"
+      - "il-jerusalem-1"
+      - "eu-zurich-1"
+      - "eu-stockholm-1"
+      - "eu-paris-1"
+      - "eu-milan-1"
+      - "eu-marseille-1"
+      - "eu-madrid-1"
+      - "eu-frankfurt-1"
+      - "eu-amsterdam-1"
+      - "ca-toronto-1"
+      - "ca-montreal-1"
+      - "ap-tokyo-1"
+      - "ap-sydney-1"
+      - "ap-singapore-1"
+      - "ap-seoul-1"
+      - "ap-osaka-1"
+      - "ap-mumbai-1"
+      - "ap-melbourne-1"
+      - "ap-hyderabad-1"
+      - "ap-chuncheon-1"
+      - "af-johannesburg-1"
+       
+    required: true
+    description: "Region where the stack will be provisioned."
+    title: "Region"
     visible: true
   iam_compartment_name:
     type: string
@@ -192,6 +243,12 @@ variables:
     required: true
     description: "Oracle-managed container orchestration service that can reduce the time and cost to build modern cloud native applications."
     title: "Deploy Oracle Kubernetes Engine (OKE)"
+    default: true
+  ons_is_deployed:
+    type: boolean
+    required: true
+    description: "highly available, low-latency publish/subscribe (pub/sub) service that sends alerts and messages to Oracle Functions, email, SMS, and message delivery partners, including Slack, PagerDuty, and ServiceNow."
+    title: "Deploy Oracle Notifications Service (ONS)"
     default: true
   streaming_is_deployed:
     type: boolean
@@ -494,57 +551,187 @@ variables:
       and:
         - oke_is_deployed
         - vcn_is_deployed
-  oke_subnet_cidr:
+  oke_subnet_cluster_cidr:
     type: string
-    description: "(Updatable) The CIDR IP address range of the subnet containing the OKE cluster and node pool."
-    title: "OKE Subnet CIDR Range"
-    default: "10.0.20.0/24"
+    description: "(Updatable) The CIDR IP address range of the subnet in which to place the cluster endpoint."
+    title: "OKE Subnet CIDR Range (Cluster)"
+    default: "10.0.0.0/28"
     required: true
     visible:
       and:
         - oke_is_deployed
         - vcn_is_deployed
-  oke_subnet_display_name:
+  oke_subnet_cluster_display_name:
     type: string
-    description: "(Updatable) A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information."
-    title: "OKE Subnet Display Name"
-    default: "AD_oke_subnet"
+    description: "(Updatable) A user-friendly name for the subnet in which to place the cluster endpoint. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Subnet Display Name (Cluster)"
+    default: "AD_oke_subnet_cluster"
     required: true
     visible:
       and:
         - oke_is_deployed
         - vcn_is_deployed
-  oke_subnet_dns_label:
+  oke_subnet_cluster_dns_label:
     type: string
-    description: "A DNS label for the OKE subnet, used in conjunction with the VNIC's hostname and VCN's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter and is unique within the VCN. The value cannot be changed. This value must be set if you want to use the Internet and VCN Resolver to resolve the hostnames of instances in the subnet. It can only be set if the VCN itself was created with a DNS label."
-    title: "OKE Subnet DNS Label"
-    default: "okesub"
+    description: "A DNS label for the subnet in which to place the cluster endpoint, used in conjunction with the VNIC's hostname and VCN's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter and is unique within the VCN. The value cannot be changed. This value must be set if you want to use the Internet and VCN Resolver to resolve the hostnames of instances in the subnet. It can only be set if the VCN itself was created with a DNS label."
+    title: "OKE Subnet DNS Label (Cluster)"
+    default: "okesubcluster"
     required: true
     visible:
       and:
         - oke_is_deployed
         - vcn_is_deployed
     pattern: "^[a-zA-Z][a-zA-Z0-9]{0,14}$"
-  oke_rt_display_name:
+  oke_rt_cluster_display_name:
     type: string
-    description: "(Updatable) A user-friendly name for the route table of the OKE subnet. Does not have to be unique, and it's changeable. Avoid entering confidential information."
-    title: "OKE Route Table Display Name"
-    default: "AD_oke_route_table"
+    description: "(Updatable) A user-friendly name for the route table of the subnet in which to place the cluster endpoint. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Route Table Display Name (Cluster)"
+    default: "AD_oke_route_table_cluster"
     required: true
     visible:
       and:
         - oke_is_deployed
         - vcn_is_deployed
-  oke_sl_display_name:
+  oke_sl_cluster_display_name:
     type: string
-    description: "(Updatable) A user-friendly name for the security list of the OKE subnet. Does not have to be unique, and it's changeable. Avoid entering confidential information."
-    title: "OKE Security List Display Name"
-    default: "AD_oke_security_list"
+    description: "(Updatable) A user-friendly name for the security list of the subnet in which to place the cluster endpoint. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Security List Display Name (Cluster)"
+    default: "AD_oke_security_list_cluster"
     required: true
     visible:
       and:
         - oke_is_deployed
         - vcn_is_deployed
+  oke_subnet_lb_cidr:
+    type: string
+    description: "(Updatable) The CIDR IP address range of the subnet in which to place the load balancer."
+    title: "OKE Subnet CIDR Range (Load Balancer)"
+    default: "10.0.20.0/24"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_lb_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the subnet in which to place the load balancer. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Subnet Display Name (Load Balancer)"
+    default: "AD_oke_subnet_lb"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_lb_dns_label:
+    type: string
+    description: "A DNS label for the subnet in which to place the load balancer, used in conjunction with the VNIC's hostname and VCN's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter and is unique within the VCN. The value cannot be changed. This value must be set if you want to use the Internet and VCN Resolver to resolve the hostnames of instances in the subnet. It can only be set if the VCN itself was created with a DNS label."
+    title: "OKE Subnet DNS Label (Load Balancer)"
+    default: "okesublb"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+    pattern: "^[a-zA-Z][a-zA-Z0-9]{0,14}$"
+  oke_rt_lb_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the route table of the subnet in which to place the load balancer. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Route Table Display Name (Load Balancer)"
+    default: "AD_oke_route_table_lb"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_sl_lb_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the security list of the subnet in which to place the load balancer. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Security List Display Name (Load Balancer)"
+    default: "AD_oke_security_list_lb"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_worker_cidr:
+    type: string
+    description: "(Updatable) The CIDR IP address range of the subnet in which to place the worker nodes."
+    title: "OKE Subnet CIDR Range (Worker Nodes)"
+    default: "10.0.10.0/24"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_worker_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the subnet in which to place the worker nodes. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Subnet Display Name (Worker Nodes)"
+    default: "AD_oke_subnet_worker"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_subnet_worker_dns_label:
+    type: string
+    description: "A DNS label for the subnet in which to place the worker nodes, used in conjunction with the VNIC's hostname and VCN's DNS label to form a fully qualified domain name (FQDN) for each VNIC within this subnet (for example, bminstance-1.subnet123.vcn1.oraclevcn.com). Must be an alphanumeric string that begins with a letter and is unique within the VCN. The value cannot be changed. This value must be set if you want to use the Internet and VCN Resolver to resolve the hostnames of instances in the subnet. It can only be set if the VCN itself was created with a DNS label."
+    title: "OKE Subnet DNS Label (Worker Nodes)"
+    default: "okesubworker"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+    pattern: "^[a-zA-Z][a-zA-Z0-9]{0,14}$"
+  oke_rt_worker_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the route table of the subnet in which to place the worker nodes. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Route Table Display Name (Worker Nodes)"
+    default: "AD_oke_route_table_worker"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+  oke_sl_worker_display_name:
+    type: string
+    description: "(Updatable) A user-friendly name for the security list of the subnet in which to place the worker nodes. Does not have to be unique, and it's changeable. Avoid entering confidential information."
+    title: "OKE Security List Display Name (Worker Nodes)"
+    default: "AD_oke_security_list_worker"
+    required: true
+    visible:
+      and:
+        - oke_is_deployed
+        - vcn_is_deployed
+
+  ons_topic_name:
+    type: string
+    required: true
+    description: "The name of the topic being created. The topic name must be unique across the tenancy. Avoid entering confidential information."
+    title: "ONS Topic Name"
+    default: "AD_ons_topic"
+    visible: ons_is_deployed
+  ons_subscription_endpoint:
+    type: string
+    required: true
+    description: "A locator that corresponds to the subscription protocol. For example, an email address for a subscription that uses the EMAIL protocol, or a URL for a subscription that uses an HTTP-based protocol. HTTP-based protocols use URL endpoints that begin with \"http:\" or \"https:\". A URL cannot exceed 512 characters. Avoid entering confidential information. For protocol-specific endpoint formats and steps to get or create endpoints, see: https://docs.cloud.oracle.com/iaas/Content/Notification/Tasks/managingtopicsandsubscriptions.htm#createSub"
+    title: "ONS Subscription Endpoint"
+    visible: ons_is_deployed
+  ons_subscription_protocol:
+    type: enum
+    required: true
+    description: "The protocol used for the subscription."
+    enum:
+      - "CUSTOM_HTTPS"
+      - "EMAIL"
+      - "ORACLE_FUNCTIONS"
+      - "PAGERDUTY"
+      - "SLACK"
+      - "SMS"
+    title: "ONS Subscription Protocol"
+    default: "EMAIL"
+    visible: ons_is_deployed
 
   stream_pool_name:
     type: string
@@ -602,6 +789,13 @@ variables:
     description: "(Updatable) A list of CIDR ranges to use for this VCN"
     title: "VCN CIDRs"
     default: ["10.0.0.0/16"]
+    visible: vcn_is_deployed
+  ig_display_name:
+    type: string
+    required: true
+    description: "(Updatable) User-friendly name for your Internet Gateway."
+    title: "Internet Gateway Display Name"
+    default: "AD_internet_gateway"
     visible: vcn_is_deployed
   ng_display_name:
     type: string

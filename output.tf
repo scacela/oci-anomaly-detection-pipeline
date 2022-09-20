@@ -22,8 +22,20 @@ output "oke_cluster_id" {
 output "oke_node_pool_id" {
   value = var.oke_is_deployed ? module.oke[0].oke_node_pool_id : null
 }
-output "oke_subnet_id" {
-  value = var.oke_is_deployed ? module.oke[0].oke_subnet_id : null
+output "oke_subnet_cluster_id" {
+  value = var.oke_is_deployed ? module.oke[0].oke_subnet_cluster_id : null
+}
+output "oke_subnet_lb_id" {
+  value = var.oke_is_deployed ? module.oke[0].oke_subnet_lb_id : null
+}
+output "oke_subnet_worker_id" {
+  value = var.oke_is_deployed ? module.oke[0].oke_subnet_worker_id : null
+}
+output "ons_topic_id" {
+  value = var.ons_is_deployed ? module.ons[0].ons_topic_id : null
+}
+output "ons_subscription_id" {
+  value = var.ons_is_deployed ? module.ons[0].ons_subscription_id : null
 }
 output "stream_pool_id" {
   value = var.streaming_is_deployed ? module.streaming[0].stream_pool_id : null

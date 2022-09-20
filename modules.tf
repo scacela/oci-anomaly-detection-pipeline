@@ -54,11 +54,21 @@ module "oke" {
   count = var.vcn_is_deployed && var.oke_is_deployed ? 1 : 0
   source = "./modules/oke"
   # configuration
-  oke_subnet_cidr = var.oke_subnet_cidr
-  oke_subnet_display_name = var.oke_subnet_display_name
-  oke_subnet_dns_label = var.oke_subnet_dns_label
-  oke_rt_display_name = var.oke_rt_display_name
-  oke_sl_display_name = var.oke_sl_display_name
+  oke_subnet_cluster_cidr = var.oke_subnet_cluster_cidr
+  oke_subnet_cluster_display_name = var.oke_subnet_cluster_display_name
+  oke_subnet_cluster_dns_label = var.oke_subnet_cluster_dns_label
+  oke_rt_cluster_display_name = var.oke_rt_cluster_display_name
+  oke_sl_cluster_display_name = var.oke_sl_cluster_display_name
+  oke_subnet_lb_cidr = var.oke_subnet_lb_cidr
+  oke_subnet_lb_display_name = var.oke_subnet_lb_display_name
+  oke_subnet_lb_dns_label = var.oke_subnet_lb_dns_label
+  oke_rt_lb_display_name = var.oke_rt_lb_display_name
+  oke_sl_lb_display_name = var.oke_sl_lb_display_name
+  oke_subnet_worker_cidr = var.oke_subnet_worker_cidr
+  oke_subnet_worker_display_name = var.oke_subnet_worker_display_name
+  oke_subnet_worker_dns_label = var.oke_subnet_worker_dns_label
+  oke_rt_worker_display_name = var.oke_rt_worker_display_name
+  oke_sl_worker_display_name = var.oke_sl_worker_display_name
   oke_is_kubernetes_dashboard_enabled = var.oke_is_kubernetes_dashboard_enabled
   oke_is_tiller_enabled = var.oke_is_tiller_enabled
   oke_pods_cidr = var.oke_pods_cidr
@@ -79,8 +89,19 @@ module "oke" {
   vcn_id = module.vcn[0].vcn_id
   vcn_default_dhcp_options_id = module.vcn[0].vcn_default_dhcp_options_id
   service_cidr_block = data.oci_core_services.services.services.0.cidr_block
+  ig_id = module.vcn[0].ig_id
   ng_id = module.vcn[0].ng_id
   sg_id = module.vcn[0].sg_id
+}
+
+module "ons" {
+  count = var.ons_is_deployed ? 1 : 0
+  source = "./modules/ons"
+  #configuration
+  compartment_id = local.new_compartment_id
+  ons_topic_name = var.ons_topic_name
+  ons_subscription_endpoint = var.ons_subscription_endpoint
+  ons_subscription_protocol = var.ons_subscription_protocol
 }
 
 module "streaming" {
@@ -100,6 +121,7 @@ module "vcn" {
   # configuration
   vcn_display_name = var.vcn_display_name
   vcn_dns_label = var.vcn_dns_label
+  ig_display_name = var.ig_display_name
   ng_display_name = var.ng_display_name
   service_id = data.oci_core_services.services.services.0.id
   sg_display_name = var.sg_display_name
