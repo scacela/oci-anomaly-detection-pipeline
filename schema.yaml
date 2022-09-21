@@ -305,7 +305,7 @@ variables:
       - Archive
     required: true
     description: "The storage tier of the object_storage_bucket. The Standard storage tier is \"hot\" storage used for data that you need to access quickly, immediately, and frequently. The Archive storage tier is \"cold\" storage used for data seldom or rarely access, but that must be retained and preserved for long periods of time."
-    title: "Bucket Access Type"
+    title: "Bucket Storage Tier"
     default: Standard
     visible: object_storage_is_deployed
   object_storage_bucket_versioning:
