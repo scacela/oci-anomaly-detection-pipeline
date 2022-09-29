@@ -18,6 +18,7 @@ variableGroups:
 # order: a tile for IAM
 - title: "Identity and Access Management (IAM)"
   variables:
+    - name_for_resources
     - parent_compartment_id
     - region
     - iam_compartment_name
@@ -111,6 +112,13 @@ variableGroups:
     - sg_display_name
 
 variables:
+  name_for_resources:
+    type: string
+    required: true
+    description: "Provide a string that will be incorporated into the unique name for a new compartment, along with other resources that will be part of this deployment whose names must be unique within the tenancy. For example, you can provide your name or initials."
+    title: "Name Your Resources"
+    visible: true
+    pattern: "^[_\\-a-zA-Z0-9\\.]{1,20}$"
   # details: a tile for IAM
   parent_compartment_id:
     type: oci:identity:compartment:id
@@ -162,8 +170,8 @@ variables:
   iam_compartment_name:
     type: string
     required: true
-    description: "(Updatable) The name you assign to the compartment during creation. The name must be unique across all compartments in the parent compartment. Avoid entering confidential information."
-    title: "Name of New Compartment"
+    description: "(Updatable) The prefix of the name you assign to the compartment during creation. The name must be unique across all compartments in the parent compartment. Avoid entering confidential information."
+    title: "Name of New Compartment (Prefix)"
     default: "AD_workshop"
     visible: true
     pattern: "^[_\\-a-zA-Z0-9\\.]*$"
@@ -191,8 +199,8 @@ variables:
   iam_policy_name:
     type: string
     required: true
-    description: "The name you assign to the policy during creation. The name must be unique across all policies in the tenancy and cannot be changed."
-    title: "IAM Policy Name"
+    description: "The prefix of the name you assign to the policy during creation. The name must be unique across all policies in the tenancy and cannot be changed."
+    title: "IAM Policy Name (Prefix)"
     default: "AD_policy"
     visible: iam_policy_is_deployed
     pattern: "^[_\\-a-zA-Z0-9\\.]*$"
@@ -206,8 +214,8 @@ variables:
   iam_dynamic_group_name:
     type: string
     required: true
-    description: "The name you assign to the dynamic group during creation. The name must be unique across all groups in the tenancy and cannot be changed."
-    title: "IAM Dynamic Group Name"
+    description: "The prefix of the name you assign to the dynamic group during creation. The name must be unique across all groups in the tenancy and cannot be changed."
+    title: "IAM Dynamic Group Name (Prefix)"
     default: "AD_dynamic_group"
     visible: iam_policy_is_deployed
     pattern: "^[_\\-a-zA-Z0-9\\.]*$"
@@ -282,8 +290,8 @@ variables:
   object_storage_bucket_name:
     type: string
     required: true
-    description: "The name of the Bucket. Valid characters are uppercase or lowercase letters, numbers, hyphens, underscores, and periods. Bucket names must be unique within an Object Storage"
-    title: "Bucket Name"
+    description: "The prefix of the name to be assigned to the Bucket. Valid characters are uppercase or lowercase letters, numbers, hyphens, underscores, and periods. Bucket names must be unique within an Object Storage namespace."
+    title: "Bucket Name (Prefix)"
     default: "Ad_bucket"
     visible: object_storage_is_deployed
     pattern: "^[_\\-a-zA-Z0-9\\.]*$"
@@ -708,8 +716,8 @@ variables:
   ons_topic_name:
     type: string
     required: true
-    description: "The name of the topic being created. The topic name must be unique across the tenancy. Avoid entering confidential information."
-    title: "ONS Topic Name"
+    description: "The prefix of the name of the topic being created. The topic name must be unique across the tenancy. Avoid entering confidential information."
+    title: "ONS Topic Name (Prefix)"
     default: "AD_ons_topic"
     visible: ons_is_deployed
   ons_subscription_endpoint:

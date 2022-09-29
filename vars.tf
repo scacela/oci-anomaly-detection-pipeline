@@ -5,6 +5,9 @@ variable "fingerprint" { default = "" }
 variable "private_key_path" { default = "" }
 variable "region" { default = "" }
 
+# naming
+variable "name_for_resources" { default = "" }
+
 # iam
 variable "parent_compartment_id" { default = "" }
 variable "iam_compartment_name" { default = "AD_workshop" }

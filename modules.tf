@@ -3,15 +3,15 @@ module "iam" {
   # configuration
   parent_compartment_id = var.parent_compartment_id
   iam_compartment_description = var.iam_compartment_description
-  iam_compartment_name = var.iam_compartment_name
+  iam_compartment_name = local.iam_compartment_name
   iam_compartment_enable_delete = var.iam_compartment_enable_delete
   tenancy_ocid = var.tenancy_ocid
   iam_policy_is_deployed = var.iam_policy_is_deployed
   iam_policy_statements = local.iam_policy_statements
   iam_dynamic_group_matching_rule = local.iam_dynamic_group_matching_rule
-  iam_policy_name = var.iam_policy_name
+  iam_policy_name = local.iam_policy_name
   iam_policy_description = var.iam_policy_description
-  iam_dynamic_group_name = var.iam_dynamic_group_name
+  iam_dynamic_group_name = local.iam_dynamic_group_name
   iam_dynamic_group_description = var.iam_dynamic_group_description
 }
 
@@ -28,11 +28,12 @@ module "object_storage" {
   count = var.object_storage_is_deployed ? 1 : 0
   source = "./modules/object_storage"
   # configuration
-  object_storage_bucket_name = var.object_storage_bucket_name
+  object_storage_bucket_name = local.object_storage_bucket_name
   object_storage_bucket_access_type = var.object_storage_bucket_access_type
   object_storage_bucket_storage_tier = var.object_storage_bucket_storage_tier
   object_storage_bucket_versioning = var.object_storage_bucket_versioning
   compartment_id = local.new_compartment_id
+  tenancy_ocid = var.tenancy_ocid
 }
 
 module "ods" {
@@ -99,7 +100,7 @@ module "ons" {
   source = "./modules/ons"
   #configuration
   compartment_id = local.new_compartment_id
-  ons_topic_name = var.ons_topic_name
+  ons_topic_name = local.ons_topic_name
   ons_subscription_endpoint = var.ons_subscription_endpoint
   ons_subscription_protocol = var.ons_subscription_protocol
 }

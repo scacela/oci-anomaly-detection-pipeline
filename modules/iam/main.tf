@@ -16,7 +16,7 @@ resource "oci_identity_policy" "policy" {
 }
 
 resource "oci_identity_dynamic_group" "dynamic_group" {
-    count = var.iam_policy_is_deployed ? 1 : 0
+    count = var.iam_policy_is_deployed && (var.iam_dynamic_group_matching_rule != null) ? 1 : 0
     #Required
     compartment_id = var.tenancy_ocid
     description = var.iam_dynamic_group_description
