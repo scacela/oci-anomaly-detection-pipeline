@@ -292,7 +292,7 @@ variables:
     required: true
     description: "The prefix of the name to be assigned to the Bucket. Valid characters are uppercase or lowercase letters, numbers, hyphens, underscores, and periods. Bucket names must be unique within an Object Storage namespace."
     title: "Bucket Name (Prefix)"
-    default: "Ad_bucket"
+    default: "AD_bucket"
     visible: object_storage_is_deployed
     pattern: "^[_\\-a-zA-Z0-9\\.]*$"
   object_storage_bucket_access_type:
