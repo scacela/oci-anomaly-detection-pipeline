@@ -211,8 +211,8 @@ resource "oci_core_security_list" "oke_sl_lb" {
     stateless = false
     tcp_options {
         # destination port range
-        max = 30000
-        min = 32767
+        max = 32767
+        min = 30000
     }
   }
   egress_security_rules {
@@ -380,8 +380,8 @@ resource "oci_core_security_list" "oke_sl_worker" {
     stateless   = false
     tcp_options {
         # destination port range
-        max = 30000
-        min = 32767
+        max = 32767
+        min = 30000
     }
   }
     ingress_security_rules {
