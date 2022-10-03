@@ -5,14 +5,14 @@ module "iam" {
   iam_compartment_description = var.iam_compartment_description
   iam_compartment_name = local.iam_compartment_name
   iam_compartment_enable_delete = var.iam_compartment_enable_delete
-  tenancy_ocid = var.tenancy_ocid
   iam_policy_is_deployed = var.iam_policy_is_deployed
-  iam_policy_statements = local.iam_policy_statements
-  iam_dynamic_group_matching_rule = local.iam_dynamic_group_matching_rule
   iam_policy_name = local.iam_policy_name
   iam_policy_description = var.iam_policy_description
   iam_dynamic_group_name = local.iam_dynamic_group_name
   iam_dynamic_group_description = var.iam_dynamic_group_description
+  tenancy_ocid = var.tenancy_ocid
+  ods_is_deployed = var.ods_is_deployed
+  ads_is_deployed = var.ads_is_deployed
 }
 
 module "ads" {

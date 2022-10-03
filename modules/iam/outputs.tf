@@ -5,5 +5,5 @@ output "iam_policy_id" {
   value = var.iam_policy_is_deployed ? oci_identity_policy.policy[0].id : null
 }
 output "iam_dynamic_group_id" {
-  value = var.iam_policy_is_deployed && (var.iam_dynamic_group_matching_rule != null) ? oci_identity_dynamic_group.dynamic_group[0].id : null
+  value = var.iam_policy_is_deployed && local.iam_dynamic_group_matching_rule_is_deployed ? oci_identity_dynamic_group.dynamic_group[0].id : null
 }

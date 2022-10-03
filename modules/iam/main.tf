@@ -12,14 +12,15 @@ resource "oci_identity_policy" "policy" {
   compartment_id = var.tenancy_ocid
   description = var.iam_policy_description
   name = var.iam_policy_name
-  statements = var.iam_policy_statements
+  statements = local.iam_policy_statements
 }
 
 resource "oci_identity_dynamic_group" "dynamic_group" {
-    count = var.iam_policy_is_deployed && (var.iam_dynamic_group_matching_rule != null) ? 1 : 0
+    depends_on = [oci_identity_compartment.compartment]
+    count = var.iam_policy_is_deployed && local.iam_dynamic_group_matching_rule_is_deployed ? 1 : 0
     #Required
     compartment_id = var.tenancy_ocid
     description = var.iam_dynamic_group_description
-    matching_rule = var.iam_dynamic_group_matching_rule
+    matching_rule = local.iam_dynamic_group_matching_rule
     name = var.iam_dynamic_group_name
 }
